@@ -289,6 +289,11 @@ export default defineComponent({
       type: Number,
       default: undefined,
     },
+
+    toggleBodyClass: {
+      type: Boolean,
+      default: undefined,
+    },
   },
 
   emits: {

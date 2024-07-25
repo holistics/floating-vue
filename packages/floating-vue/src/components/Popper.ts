@@ -277,6 +277,11 @@ const createPopper = () => defineComponent({
       type: Number,
       default: defaultPropFactory('disposeTimeout'),
     },
+
+    toggleBodyClass: {
+      type: Boolean,
+      default: undefined,
+    },
   },
 
   emits: {
@@ -773,10 +778,12 @@ const createPopper = () => defineComponent({
       }
 
       shownPoppers.push(this)
-      document.body.classList.add('v-popper--some-open')
-      for (const theme of getAllParentThemes(this.theme)) {
-        getShownPoppersByTheme(theme).push(this)
-        document.body.classList.add(`v-popper--some-open--${theme}`)
+      if (this.toggleBodyClass) {
+        this.toggleBodyClass && document.body.classList.add('v-popper--some-open')
+        for (const theme of getAllParentThemes(this.theme)) {
+          getShownPoppersByTheme(theme).push(this)
+          document.body.classList.add(`v-popper--some-open--${theme}`)
+        }
       }
 
       this.$emit('apply-show')
@@ -807,14 +814,16 @@ const createPopper = () => defineComponent({
 
       this.skipTransition = skipTransition
       removeFromArray(shownPoppers, this)
-      if (shownPoppers.length === 0) {
-        document.body.classList.remove('v-popper--some-open')
-      }
-      for (const theme of getAllParentThemes(this.theme)) {
-        const list = getShownPoppersByTheme(theme)
-        removeFromArray(list, this)
-        if (list.length === 0) {
-          document.body.classList.remove(`v-popper--some-open--${theme}`)
+      if (this.toggleBodyClass) {
+        if (shownPoppers.length === 0) {
+          document.body.classList.remove('v-popper--some-open')
+        }
+        for (const theme of getAllParentThemes(this.theme)) {
+          const list = getShownPoppersByTheme(theme)
+          removeFromArray(list, this)
+          if (list.length === 0) {
+            document.body.classList.remove(`v-popper--some-open--${theme}`)
+          }
         }
       }
 
