@@ -49,6 +49,17 @@ function defaultPropFactory (prop: string) {
 
 const PROVIDE_KEY = '__floating-vue__popper'
 
+function normalizeTriggers (
+  commonTriggers: string[],
+  customTriggers?: string[] | ((commonTriggers: string[]) => string[]),
+) {
+  if (customTriggers != null) {
+    return typeof customTriggers === 'function' ? customTriggers(commonTriggers) : customTriggers
+  }
+
+  return commonTriggers
+}
+
 const createPopper = () => defineComponent({
   name: 'VPopper',
 
@@ -282,6 +293,11 @@ const createPopper = () => defineComponent({
       type: Boolean,
       default: undefined,
     },
+
+    fixDiagonalSubmenuProblem: {
+      type: [Boolean, Number],
+      default: undefined,
+    },
   },
 
   emits: {
@@ -362,7 +378,18 @@ const createPopper = () => defineComponent({
       return this[PROVIDE_KEY]?.parentPopper
     },
 
-    hasPopperShowTriggerHover () {
+    shouldFixDiagonalSubmenuProblem () {
+      return this.fixDiagonalSubmenuProblem === true || typeof this.fixDiagonalSubmenuProblem === 'number'
+    },
+
+    hasHoverableTrigger () {
+      if (this.shouldFixDiagonalSubmenuProblem) {
+        const showTriggers = normalizeTriggers(this.triggers, this.showTriggers)
+        const popperShowTriggers = normalizeTriggers(this.popperTriggers, this.popperShowTriggers)
+
+        return showTriggers.includes('hover') && popperShowTriggers.includes('hover')
+      }
+
       return this.popperTriggers?.includes('hover') || this.popperShowTriggers?.includes('hover')
     },
   },
@@ -468,16 +495,24 @@ const createPopper = () => defineComponent({
       }
 
       // Abort if aiming for the popper
-      if (this.hasPopperShowTriggerHover && this.$_isAimingPopper()) {
+      if (this.hasHoverableTrigger && this.$_isAimingPopper()) {
         if (this.parentPopper) {
           this.parentPopper.lockedChild = this
           clearTimeout(this.parentPopper.lockedChildTimer)
+
+          let timeout = 1000
+          if (this.fixDiagonalSubmenuProblem === true) {
+            timeout = 250
+          } else if (typeof this.fixDiagonalSubmenuProblem === 'number') {
+            timeout = this.fixDiagonalSubmenuProblem
+          }
+
           this.parentPopper.lockedChildTimer = setTimeout(() => {
             if (this.parentPopper.lockedChild === this) {
               this.parentPopper.lockedChild.hide({ skipDelay })
               this.parentPopper.lockedChild = null
             }
-          }, 1000)
+          }, timeout)
         }
         return
       }
@@ -490,6 +525,12 @@ const createPopper = () => defineComponent({
 
       this.$emit('hide')
       this.$emit('update:shown', false)
+    },
+
+    handlePopperNodeHovered () {
+      if (this.parentPopper?.lockedChild === this) {
+        this.parentPopper.lockedChild = null
+      }
     },
 
     init () {
@@ -904,8 +945,17 @@ const createPopper = () => defineComponent({
         !this.$_preventShow && this.show({ event })
       }
 
-      this.$_registerTriggerListeners(this.$_targetNodes, SHOW_EVENT_MAP, this.triggers, this.showTriggers, handleShow)
-      this.$_registerTriggerListeners([this.$_popperNode], SHOW_EVENT_MAP, this.popperTriggers, this.popperShowTriggers, handleShow)
+      const showTriggers = normalizeTriggers(this.triggers, this.showTriggers)
+      const hideTriggers = normalizeTriggers(this.triggers, this.hideTriggers)
+      const popperShowTriggers = normalizeTriggers(this.popperTriggers, this.popperShowTriggers)
+      const popperHideTriggers = normalizeTriggers(this.popperTriggers, this.popperHideTriggers)
+
+      this.$_registerTriggerListeners(this.$_targetNodes, SHOW_EVENT_MAP, showTriggers, handleShow)
+      this.$_registerTriggerListeners([this.$_popperNode], SHOW_EVENT_MAP, popperShowTriggers, handleShow)
+
+      if (this.shouldFixDiagonalSubmenuProblem && this.hasHoverableTrigger) {
+        this.$_registerTriggerListeners([this.$_popperNode], SHOW_EVENT_MAP, popperShowTriggers, this.handlePopperNodeHovered)
+      }
 
       // Add trigger hide events
 
@@ -916,8 +966,8 @@ const createPopper = () => defineComponent({
         this.hide({ event })
       }
 
-      this.$_registerTriggerListeners(this.$_targetNodes, HIDE_EVENT_MAP, this.triggers, this.hideTriggers, handleHide)
-      this.$_registerTriggerListeners([this.$_popperNode], HIDE_EVENT_MAP, this.popperTriggers, this.popperHideTriggers, handleHide)
+      this.$_registerTriggerListeners(this.$_targetNodes, HIDE_EVENT_MAP, hideTriggers, handleHide)
+      this.$_registerTriggerListeners([this.$_popperNode], HIDE_EVENT_MAP, popperHideTriggers, handleHide)
     },
 
     $_registerEventListeners (targetNodes: Element[], eventType: string, handler: (event: Event) => void) {
@@ -929,13 +979,7 @@ const createPopper = () => defineComponent({
         : undefined))
     },
 
-    $_registerTriggerListeners (targetNodes: Element[], eventMap: Record<string, string>, commonTriggers, customTrigger, handler: (event: Event) => void) {
-      let triggers = commonTriggers
-
-      if (customTrigger != null) {
-        triggers = typeof customTrigger === 'function' ? customTrigger(triggers) : customTrigger
-      }
-
+    $_registerTriggerListeners (targetNodes: Element[], eventMap: Record<string, string>, triggers: string[], handler: (event: Event) => void) {
       triggers.forEach(trigger => {
         const eventType = eventMap[trigger]
         if (eventType) {

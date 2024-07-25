@@ -1,5 +1,15 @@
 # Changelog
 
+## v5.2.2-holistics.2
+
+### 🩹 Fixes
+
+  - Add `fixDiagonalSubmenuProblem` prop, fix [#916](https://github.com/Akryum/floating-vue/issues/916)
+
+### ❤️  Contributors
+
+- Cuong Vuong ([@cuong-vuong-holistics](https://github.com/cuong-vuong-holistics))
+
 ## v5.2.2-holistics.1
 
 ### 🚀 Performance Improvements

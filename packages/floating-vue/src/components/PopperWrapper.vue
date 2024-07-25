@@ -294,6 +294,11 @@ export default defineComponent({
       type: Boolean,
       default: undefined,
     },
+
+    fixDiagonalSubmenuProblem: {
+      type: [Boolean, Number],
+      default: undefined,
+    },
   },
 
   emits: {
