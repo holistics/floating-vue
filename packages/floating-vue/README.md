@@ -5,6 +5,7 @@
 This fork has the `@holistics/floating-vue` package that tries to fix the following issues:
 
 - **[Performance]** Disable toggling CSS class of `<body>`: this makes the entire page reflow whenever some floating elements are shown/all are hidden ([PR #1019](https://github.com/Akryum/floating-vue/pull/1019)). Can be re-enabled via `toggleBodyClass` prop.
+- **[Fix]** Properly fix diagonal submenu problem ([#916](https://github.com/Akryum/floating-vue/issues/916)) via `fixDiagonalSubmenuProblem` prop
 
 ### 📦️ Versioning and syncing
 
