@@ -1,8 +1,11 @@
 {
-  "name": "floating-vue",
+  "name": "@holistics/floating-vue",
   "version": "5.2.2",
-  "description": "Easy Vue tooltips, dropdowns, menus & popovers using floating-ui",
-  "author": "Guillaume Chau <guillaume.b.chau@gmail.com>",
+  "description": "Holistics fork of Floating Vue - Easy Vue tooltips, dropdowns, menus & popovers using floating-ui",
+  "contributors": [
+    "Guillaume Chau <guillaume.b.chau@gmail.com>",
+    "Holistics"
+  ],
   "scripts": {
     "dev": "cross-env NODE_ENV=development vite build --watch",
     "build": "cross-env NODE_ENV=production vite build && vue-tsc -d --emitDeclarationOnly",
@@ -61,9 +64,9 @@
     "not dead"
   ],
   "bugs": {
-    "url": "https://github.com/Akryum/floating-vue/issues"
+    "url": "https://github.com/holistics/floating-vue/issues"
   },
-  "homepage": "https://floating-vue.starpad.dev/",
+  "homepage": "https://github.com/holistics/floating-vue",
   "keywords": [
     "vue",
     "popper",
@@ -75,7 +78,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Akryum/floating-vue.git",
+    "url": "git+https://github.com/holistics/floating-vue.git",
     "directory": "packages/floating-vue"
   }
 }
