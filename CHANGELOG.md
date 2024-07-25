@@ -1,5 +1,15 @@
 # Changelog
 
+## v5.2.2-holistics.1
+
+### 🚀 Performance Improvements
+
+  - Disable toggle `<body>` CSS class by default to avoid performance overhead. Can be re-enabled via `toggleBodyClass` prop. ([PR #1019](https://github.com/Akryum/floating-vue/pull/1019))
+
+### ❤️  Contributors
+
+- Cuong Vuong ([@cuong-vuong-holistics](https://github.com/cuong-vuong-holistics))
+
 ## v5.2.2
 
 
