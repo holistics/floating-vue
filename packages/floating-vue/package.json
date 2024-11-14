@@ -1,6 +1,6 @@
 {
   "name": "@holistics/floating-vue",
-  "version": "5.2.2-holistics.2",
+  "version": "5.2.2-holistics.3",
   "description": "Holistics fork of Floating Vue - Easy Vue tooltips, dropdowns, menus & popovers using floating-ui",
   "contributors": [
     "Guillaume Chau <guillaume.b.chau@gmail.com>",

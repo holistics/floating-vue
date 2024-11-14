@@ -1,5 +1,15 @@
 # Changelog
 
+## v5.2.2-holistics.3
+
+### 🩹 Fixes
+
+  - Fix sibling submenus not showing after current submenu is timed out and hidden
+
+### ❤️  Contributors
+
+- Cuong Vuong ([@cuong-vuong-holistics](https://github.com/cuong-vuong-holistics))
+
 ## v5.2.2-holistics.2
 
 ### 🩹 Fixes

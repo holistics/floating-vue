@@ -465,7 +465,15 @@ const createPopper = () => defineComponent({
 
   methods: {
     show ({ event = null, skipDelay = false, force = false } = {}) {
-      if (this.parentPopper?.lockedChild && this.parentPopper.lockedChild !== this) return
+      if (this.parentPopper?.lockedChild && this.parentPopper.lockedChild !== this) {
+        if (this.shouldFixDiagonalSubmenuProblem && this.hasHoverableTrigger) {
+          /** This is to save the last child calling `show` and is not locked so that it can show again after the timeout
+           * of locked child.
+           */
+          this.parentPopper.unlockedLastPendingShowChild = this
+        }
+        return
+      }
 
       this.pendingHide = false
       if (force || !this.disabled) {
@@ -486,6 +494,11 @@ const createPopper = () => defineComponent({
     },
 
     hide ({ event = null, skipDelay = false } = {}) {
+      // "unlocked" state -> aggressively unset
+      if (this.parentPopper?.unlockedLastPendingShowChild === this) {
+        this.parentPopper.unlockedLastPendingShowChild = null
+      }
+
       if (this.$_hideInProgress) return
 
       // Abort if child is shown
@@ -511,6 +524,9 @@ const createPopper = () => defineComponent({
             if (this.parentPopper.lockedChild === this) {
               this.parentPopper.lockedChild.hide({ skipDelay })
               this.parentPopper.lockedChild = null
+
+              this.parentPopper.unlockedLastPendingShowChild?.show({ skipDelay })
+              this.parentPopper.unlockedLastPendingShowChild = null
             }
           }, timeout)
         }
